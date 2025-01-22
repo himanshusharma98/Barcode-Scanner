@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarCode ScannerAPI", "BarCode ScannerAPI\BarCode ScannerAPI.csproj", "{ED2D5906-827E-46A9-A720-C7FDEDEA1BCD}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "barcode-qr-frontend", "barcode-qr-frontend\barcode-qr-frontend.esproj", "{63C03F53-992A-4553-9BF6-CDD56F287F8E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ED2D5906-827E-46A9-A720-C7FDEDEA1BCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED2D5906-827E-46A9-A720-C7FDEDEA1BCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED2D5906-827E-46A9-A720-C7FDEDEA1BCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED2D5906-827E-46A9-A720-C7FDEDEA1BCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63C03F53-992A-4553-9BF6-CDD56F287F8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63C03F53-992A-4553-9BF6-CDD56F287F8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63C03F53-992A-4553-9BF6-CDD56F287F8E}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{63C03F53-992A-4553-9BF6-CDD56F287F8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63C03F53-992A-4553-9BF6-CDD56F287F8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63C03F53-992A-4553-9BF6-CDD56F287F8E}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
