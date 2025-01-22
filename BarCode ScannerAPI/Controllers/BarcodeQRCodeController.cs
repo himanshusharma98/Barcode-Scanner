@@ -33,12 +33,25 @@ namespace BarCode_ScannerAPI.Controllers
             }
         }
 
+        [HttpGet("fetch")]
+        public IActionResult FetchScannedData()
+        {
+            try
+            {
+                var data = _dbContext.ScannedData.ToList();
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
 
         [HttpGet("download")]
         public IActionResult DownloadExcel()
         {
             var data = _dbContext.ScannedData.ToList();
-             var workbook = new ClosedXML.Excel.XLWorkbook();
+            var workbook = new ClosedXML.Excel.XLWorkbook();
             var worksheet = workbook.Worksheets.Add("ScannedData");
 
             // Header row
@@ -56,14 +69,11 @@ namespace BarCode_ScannerAPI.Controllers
                 worksheet.Cell(i + 2, 4).Value = data[i].Timestamp;
             }
 
-           
             var stream = new MemoryStream();
             workbook.SaveAs(stream);
-            stream.Position = 0; 
+            stream.Position = 0;
 
-           
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ScannedData.xlsx");
         }
-
     }
 }

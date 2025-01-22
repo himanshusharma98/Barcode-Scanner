@@ -1,10 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Box, Button, TextField, MenuItem, Typography, Container } from "@mui/material";
+import {
+    Box,
+    Button,
+    TextField,
+    MenuItem,
+    Typography,
+    Container,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+} from "@mui/material";
 
 const App = () => {
     const [codeType, setCodeType] = useState("Barcode");
     const [codeValue, setCodeValue] = useState("");
+    const [scannedData, setScannedData] = useState([]);
+
+    const fetchScannedData = async () => {
+        try {
+            const response = await axios.get("https://localhost:7272/api/BarcodeQRCode/fetch");
+            setScannedData(response.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            alert("Failed to fetch data.");
+        }
+    };
+
+    useEffect(() => {
+        fetchScannedData();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -15,6 +44,7 @@ const App = () => {
             });
             alert("Data added successfully!");
             setCodeValue("");
+            fetchScannedData();
         } catch (error) {
             console.error("Error adding data:", error);
             alert("Failed to add data.");
@@ -59,6 +89,31 @@ const App = () => {
                     </Button>
                 </Box>
             </Box>
+            <Typography variant="h5" sx={{ mt: 5 }}>
+                Scanned Data
+            </Typography>
+            <TableContainer component={Paper} sx={{ mt: 3 }}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>ID</TableCell>
+                            <TableCell>Code Type</TableCell>
+                            <TableCell>Code Value</TableCell>
+                            <TableCell>Timestamp</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {scannedData.map((data) => (
+                            <TableRow key={data.id}>
+                                <TableCell>{data.id}</TableCell>
+                                <TableCell>{data.codeType}</TableCell>
+                                <TableCell>{data.codeValue}</TableCell>
+                                <TableCell>{new Date(data.timestamp).toLocaleString()}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </Container>
     );
 };
