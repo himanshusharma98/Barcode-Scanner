@@ -2,7 +2,6 @@
 using BarCode_ScannerAPI.Modals;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 
 namespace BarCode_ScannerAPI.Controllers
 {
@@ -34,11 +33,15 @@ namespace BarCode_ScannerAPI.Controllers
         }
 
         [HttpGet("fetch")]
-        public IActionResult FetchScannedData()
+        public IActionResult FetchScannedData(int page = 1, int pageSize = 10)
         {
             try
             {
-                var data = _dbContext.ScannedData.ToList();
+                var data = _dbContext.ScannedData
+                    .OrderByDescending(d => d.Timestamp)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
                 return Ok(data);
             }
             catch (Exception ex)
@@ -51,7 +54,7 @@ namespace BarCode_ScannerAPI.Controllers
         public IActionResult DownloadExcel()
         {
             var data = _dbContext.ScannedData.ToList();
-            var workbook = new ClosedXML.Excel.XLWorkbook();
+            var workbook = new XLWorkbook();
             var worksheet = workbook.Worksheets.Add("ScannedData");
 
             // Header row
@@ -74,6 +77,27 @@ namespace BarCode_ScannerAPI.Controllers
             stream.Position = 0;
 
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ScannedData.xlsx");
+        }
+
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteScannedData(int id)
+        {
+            try
+            {
+                var data = await _dbContext.ScannedData.FindAsync(id);
+                if (data == null)
+                {
+                    return NotFound(new { message = "Data not found." });
+                }
+
+                _dbContext.ScannedData.Remove(data);
+                await _dbContext.SaveChangesAsync();
+                return Ok(new { message = "Data deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
         }
     }
 }
