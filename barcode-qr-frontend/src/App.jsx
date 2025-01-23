@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import {
     Box,
@@ -15,7 +15,6 @@ import {
     TableRow,
     Paper,
     Grid,
-    Pagination,
 } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -25,18 +24,20 @@ const App = () => {
     const [codeType, setCodeType] = useState("Barcode");
     const [codeValue, setCodeValue] = useState("");
     const [scannedData, setScannedData] = useState([]);
-    const [currentPageData, setCurrentPageData] = useState([]);
-    const [totalRecords, setTotalRecords] = useState(0);
-    const [page, setPage] = useState(1);
-    const recordsPerPage = 5; // Set to 5 records per page
+    const [searchQuery, setSearchQuery] = useState("");
+    const [codeValueError, setCodeValueError] = useState(false);
+    const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+    const filteredData = scannedData.filter(
+        (item) =>
+            item.codeType.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.codeValue.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const fetchScannedData = async () => {
         try {
             const response = await axios.get(`https://localhost:7272/api/BarcodeQRCode/fetch`);
-            const fetchedData = response.data;
-            setScannedData(fetchedData);
-            setTotalRecords(fetchedData.length);
-            setCurrentPageData(fetchedData.slice(0, recordsPerPage));
+            setScannedData(response.data);
         } catch (error) {
             console.error("Error fetching data:", error);
             alert("Failed to fetch data.");
@@ -47,14 +48,14 @@ const App = () => {
         fetchScannedData();
     }, []);
 
-    useEffect(() => {
-        const startIndex = (page - 1) * recordsPerPage;
-        const endIndex = startIndex + recordsPerPage;
-        setCurrentPageData(scannedData.slice(startIndex, endIndex));
-    }, [page, scannedData]);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!codeValue.trim()) {
+            setCodeValueError(true);
+            return;
+        }
+
         try {
             await axios.post("https://localhost:7272/api/BarcodeQRCode/add", {
                 codeType,
@@ -62,6 +63,7 @@ const App = () => {
             });
             alert("Data added successfully!");
             setCodeValue("");
+            setCodeValueError(false);
             fetchScannedData();
         } catch (error) {
             console.error("Error adding data:", error);
@@ -90,7 +92,6 @@ const App = () => {
                 Barcode/QRCode Scanner
             </Typography>
             <Grid container spacing={4} sx={{ mt: 3 }}>
-                {/* Form Section */}
                 <Grid item xs={12} md={6}>
                     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ p: 3, boxShadow: 3, borderRadius: 2 }}>
                         <Typography variant="h5" gutterBottom>
@@ -111,9 +112,14 @@ const App = () => {
                             fullWidth
                             label="Code Value"
                             value={codeValue}
-                            onChange={(e) => setCodeValue(e.target.value)}
+                            onChange={(e) => {
+                                setCodeValue(e.target.value);
+                                if (e.target.value.trim()) setCodeValueError(false);
+                            }}
                             margin="normal"
                             required
+                            error={codeValueError}
+                            helperText={codeValueError ? "Code Value is required" : ""}
                         />
                         <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
                             <Button type="submit" variant="contained" color="primary" startIcon={<AddCircleIcon />}>
@@ -123,7 +129,6 @@ const App = () => {
                     </Box>
                 </Grid>
 
-                {/* Table Section */}
                 <Grid item xs={12} md={6}>
                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                         <Typography variant="h5" color="textSecondary">
@@ -133,31 +138,56 @@ const App = () => {
                             Export to Excel
                         </Button>
                     </Box>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+                        {!isSearchVisible ? (
+                            <Button variant="outlined" onClick={() => setIsSearchVisible(true)}>
+                                Search
+                            </Button>
+                        ) : (
+                            <TextField
+                                placeholder="Search by Code Type or Value"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onBlur={() => setIsSearchVisible(false)} // Hides the bar on losing focus
+                                variant="outlined"
+                                sx={{
+                                    width: "300px",
+                                    backgroundColor: "#f5f5f5",
+                                    borderRadius: "50px",
+                                }}
+                            />
+                        )}
+                    </Box>
                     <TableContainer
                         component={Paper}
                         sx={{
                             boxShadow: 3,
                             borderRadius: 2,
-                            overflowX: "auto", // Ensure smooth scrolling for very small screens
-                            width: "100%", // Occupy the full width of the container
+                            maxHeight: "400px",
+                            overflowY: "auto",
                         }}
                     >
                         <Table stickyHeader>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f5f5f5", width: "10%" }}>ID</TableCell>
-                                    <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f5f5f5", width: "20%" }}>Code Type</TableCell>
-                                    <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f5f5f5", width: "35%" }}>Code Value</TableCell>
-                                    <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f5f5f5", width: "25%" }}>Timestamp</TableCell>
-                                    <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f5f5f5", width: "10%" }}>Actions</TableCell>
+                                    <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f5f5f5", borderRadius: "8px 0 0 8px" }}>
+                                        ID
+                                    </TableCell>
+                                    <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f5f5f5" }}>Code Type</TableCell>
+                                    <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f5f5f5" }}>Code Value</TableCell>
+                                    <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f5f5f5" }}>Timestamp</TableCell>
+                                    <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f5f5f5", borderRadius: "0 8px 8px 0" }}>
+                                        Actions
+                                    </TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {currentPageData.map((data, index) => (
+                                {filteredData.map((data, index) => (
                                     <TableRow
                                         key={data.id}
                                         sx={{
                                             backgroundColor: index % 2 === 0 ? "#fafafa" : "#fff",
+                                            "&:last-child td": { border: 0 },
                                         }}
                                     >
                                         <TableCell>{data.id}</TableCell>
@@ -179,14 +209,6 @@ const App = () => {
                             </TableBody>
                         </Table>
                     </TableContainer>
-                    <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
-                        <Pagination
-                            count={Math.ceil(totalRecords / recordsPerPage)}
-                            page={page}
-                            onChange={(e, value) => setPage(value)}
-                            color="primary"
-                        />
-                    </Box>
                 </Grid>
             </Grid>
         </Container>

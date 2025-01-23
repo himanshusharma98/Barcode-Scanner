@@ -21,7 +21,8 @@ namespace BarCode_ScannerAPI.Controllers
         {
             try
             {
-                data.Timestamp = DateTime.UtcNow;
+                // Use system local datetime instead of UTC
+                data.Timestamp = DateTime.Now;
                 await _dbContext.ScannedData.AddAsync(data);
                 await _dbContext.SaveChangesAsync();
                 return Ok(new { message = "Data added successfully." });
@@ -32,15 +33,15 @@ namespace BarCode_ScannerAPI.Controllers
             }
         }
 
+
         [HttpGet("fetch")]
-        public IActionResult FetchScannedData(int page = 1, int pageSize = 10)
+        public IActionResult FetchScannedData()
         {
             try
             {
+                // Fetch all records from the database
                 var data = _dbContext.ScannedData
-                    .OrderByDescending(d => d.Timestamp)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
+                    .OrderByDescending(d => d.Timestamp) // Sort by timestamp (optional)
                     .ToList();
                 return Ok(data);
             }
@@ -49,6 +50,7 @@ namespace BarCode_ScannerAPI.Controllers
                 return StatusCode(500, new { message = ex.Message });
             }
         }
+
 
         [HttpGet("download")]
         public IActionResult DownloadExcel()
