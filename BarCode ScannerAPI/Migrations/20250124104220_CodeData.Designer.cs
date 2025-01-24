@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BarCode_ScannerAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250121065847_ScannedData")]
-    partial class ScannedData
+    [Migration("20250124104220_CodeData")]
+    partial class CodeData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,6 +47,27 @@ namespace BarCode_ScannerAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ScannedData");
+                });
+
+            modelBuilder.Entity("BarCode_ScannerAPI.Modals.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
                 });
 #pragma warning restore 612, 618
         }

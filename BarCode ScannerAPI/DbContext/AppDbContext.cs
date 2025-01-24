@@ -10,5 +10,6 @@ namespace BarCode_ScannerAPI.DbContext
         }
 
         public DbSet<ScannedData> ScannedData { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

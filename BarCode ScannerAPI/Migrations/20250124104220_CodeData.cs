@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BarCode_ScannerAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class ScannedData : Migration
+    public partial class CodeData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,6 +25,20 @@ namespace BarCode_ScannerAPI.Migrations
                 {
                     table.PrimaryKey("PK_ScannedData", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
         }
 
         /// <inheritdoc />
@@ -32,6 +46,9 @@ namespace BarCode_ScannerAPI.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ScannedData");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }
