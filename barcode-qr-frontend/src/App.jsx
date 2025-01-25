@@ -120,8 +120,27 @@ const App = () => {
         }
     };
 
-    const handleDownload = () => {
-        window.open("https://localhost:7272/api/BarcodeQRCode/download", "_blank");
+    const handleDownload = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get("https://localhost:7272/api/BarcodeQRCode/download", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                responseType: "blob",
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "scanned_data.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            console.error("Error downloading file:", error);
+            alert("Failed to download file.");
+        }
     };
 
     const handleDelete = async (id) => {
@@ -289,7 +308,7 @@ const App = () => {
                             <Grid item xs={12} md={6}>
                                 <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
                                     <CardContent>
-                                        <Typography variant="h5" gutterBottom>
+                                        <Typography variant="h4" gutterBottom align="center">
                                             Login
                                         </Typography>
                                         <Divider sx={{ mb: 2 }} />
@@ -337,7 +356,7 @@ const App = () => {
                                                 }
                                             />
                                             {loginError && (
-                                                <Typography color="error">
+                                                <Typography color="error" align="center">
                                                     {loginError}
                                                 </Typography>
                                             )}
@@ -357,7 +376,7 @@ const App = () => {
                             <Grid item xs={12} md={6}>
                                 <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
                                     <CardContent>
-                                        <Typography variant="h5" gutterBottom>
+                                        <Typography variant="h4" gutterBottom align="center">
                                             Sign Up
                                         </Typography>
                                         <Divider sx={{ mb: 2 }} />
@@ -424,7 +443,7 @@ const App = () => {
                                                 }
                                             />
                                             {signUpError && (
-                                                <Typography color="error">
+                                                <Typography color="error" align="center">
                                                     {signUpError}
                                                 </Typography>
                                             )}
@@ -449,7 +468,7 @@ const App = () => {
                             <Grid item xs={12} md={6}>
                                 <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
                                     <CardContent>
-                                        <Typography variant="h5" gutterBottom>
+                                        <Typography variant="h4" gutterBottom align="center">
                                             Add New Code
                                         </Typography>
                                         <Divider sx={{ mb: 2 }} />
@@ -536,7 +555,7 @@ const App = () => {
                                                 mb: 2,
                                             }}
                                         >
-                                            <Typography variant="h5">
+                                            <Typography variant="h4" gutterBottom align="center">
                                                 Scanned Data
                                             </Typography>
                                             <Button
