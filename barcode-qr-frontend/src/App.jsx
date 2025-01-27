@@ -33,7 +33,10 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import QrCodeScannerIcon from "@mui/icons-material/QrCodeScanner";
-import { BrowserMultiFormatReader } from "@zxing/browser";
+import DeleteConfirmationDialog from './DeleteConfirmationDialog';
+import QrCodeScanner from './QrCodeScanner';
+import { BrowserMultiFormatReader } from '@zxing/library';
+
 
 const App = () => {
     const [codeType, setCodeType] = useState("Barcode");
@@ -59,7 +62,8 @@ const App = () => {
     const [confirmPasswordError, setConfirmPasswordError] = useState(false);
     const [loading, setLoading] = useState(false);
     const [isScannerOpen, setIsScannerOpen] = useState(false);
-    const videoRef = useRef(null);
+    const [deleteId, setDeleteId] = useState(null);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const filteredData = scannedData.filter(
         (item) =>
@@ -78,7 +82,6 @@ const App = () => {
             setScannedData(response.data);
         } catch (error) {
             console.error("Error fetching data:", error);
-            alert("Failed to fetch data.");
         }
     };
 
@@ -110,13 +113,11 @@ const App = () => {
                     },
                 }
             );
-            alert("Data added successfully!");
             setCodeValue("");
             setCodeValueError(false);
             fetchScannedData();
         } catch (error) {
             console.error("Error adding data:", error);
-            alert("Failed to add data.");
         }
     };
 
@@ -139,7 +140,6 @@ const App = () => {
             link.remove();
         } catch (error) {
             console.error("Error downloading file:", error);
-            alert("Failed to download file.");
         }
     };
 
@@ -151,7 +151,6 @@ const App = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            alert("Data deleted successfully!");
             fetchScannedData();
         } catch (error) {
             console.error("Error deleting data:", error);
@@ -227,7 +226,7 @@ const App = () => {
                 username: signUpUsername,
                 password: signUpPassword,
             });
-            alert("User registered successfully!");
+            alert("User  registered successfully!");
             setSignUpUsername("");
             setSignUpPassword("");
             setConfirmPassword("");
@@ -271,6 +270,15 @@ const App = () => {
         }
     }, [isScannerOpen]);
 
+    // Function to handle delete confirmation
+    const handleDeleteConfirmation = () => {
+        if (deleteId) {
+            handleDelete(deleteId);
+            setDeleteId(null); // Reset deleteId after deletion
+        }
+        setIsDeleteDialogOpen(false); // Close the dialog
+    };
+
     return (
         <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
             <AppBar position="static">
@@ -280,7 +288,7 @@ const App = () => {
                     </Typography>
                     {isAuthenticated && (
                         <>
-                            <Typography variant="h6" sx={{ mr: 2 }}>
+                            <Typography variant="subtitle1" sx={{ mr: 2 }}>
                                 Welcome, {loggedInUsername}
                             </Typography>
                             <Button color="inherit" onClick={handleLogout}>
@@ -656,11 +664,10 @@ const App = () => {
                                                                     startIcon={
                                                                         <DeleteIcon />
                                                                     }
-                                                                    onClick={() =>
-                                                                        handleDelete(
-                                                                            data.id
-                                                                        )
-                                                                    }
+                                                                    onClick={() => {
+                                                                        setDeleteId(data.id); // Set the ID of the item to delete
+                                                                        setIsDeleteDialogOpen(true); // Open the confirmation dialog
+                                                                    }}
                                                                 >
                                                                     Delete
                                                                 </Button>
@@ -680,7 +687,14 @@ const App = () => {
             <Dialog open={isScannerOpen} onClose={() => setIsScannerOpen(false)}>
                 <DialogTitle>Scan QR Code</DialogTitle>
                 <DialogContent>
-                    <video ref={videoRef} style={{ width: "100%" }} />
+                    <QrCodeScanner
+                        onScan={(value) => {
+                            setCodeValue(value);
+                            setCodeType("QRCode");
+                            setIsScannerOpen(false);
+                        }}
+                        onClose={() => setIsScannerOpen(false)}
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setIsScannerOpen(false)} color="primary">
@@ -688,6 +702,13 @@ const App = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <DeleteConfirmationDialog
+                open={isDeleteDialogOpen}
+                onClose={() => setIsDeleteDialogOpen(false)}
+                onConfirm={handleDeleteConfirmation}
+            />
         </Box>
     );
 };
