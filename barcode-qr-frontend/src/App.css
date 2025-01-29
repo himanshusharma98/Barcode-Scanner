@@ -1,1 +1,167 @@
+/* App.css */
 
+/* General styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Card styles */
+.card {
+    max-width: 600px;
+    margin: auto;
+    margin-top: 4rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    background-color: #ffffff;
+    overflow: hidden;
+}
+
+/* Card content styles */
+.card-content {
+    padding: 2rem;
+}
+
+/* Form control styles */
+.form-control {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+/* Select styles */
+.select {
+    width: 100%;
+}
+
+/* Button styles */
+.button {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button-primary {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.button-primary:hover {
+    background-color: #0056b3;
+}
+
+.button-secondary {
+    background-color: #6c757d;
+    color: #ffffff;
+}
+
+.button-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Video container styles */
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #007bff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Video styles */
+.video {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    display: none;
+}
+
+.video.active {
+    display: block;
+}
+
+/* Circular progress styles */
+.circular-progress {
+    margin-top: 2rem;
+}
+
+/* Box styles */
+.box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Flashlight button styles */
+.flashlight-button {
+    margin-top: 1rem;
+}
+
+/* Start scanning button styles */
+.start-scanning-button {
+    margin-top: 1rem;
+}
+
+/* Scanning area highlight styles */
+.scanning-area-highlight {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #00ff00;
+    box-sizing: border-box;
+}
+
+.highlight-border {
+    position: absolute;
+    border: 2px solid #00ff00;
+    box-sizing: border-box;
+}
+
+.highlight-border.top {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 10px;
+}
+
+.highlight-border.right {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 10px;
+}
+
+.highlight-border.bottom {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 10px;
+}
+
+.highlight-border.left {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 10px;
+}
