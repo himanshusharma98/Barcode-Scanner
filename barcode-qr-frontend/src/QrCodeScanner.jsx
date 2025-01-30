@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BrowserMultiFormatReader, BarcodeFormat } from '@zxing/browser';
-import { Box, Card, CardContent, Typography, CircularProgress, Button, FormControl, InputLabel, Select, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
+import { Box, Card, CardContent, Typography, Button, FormControl, InputLabel, Select, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import FlashlightOnIcon from '@mui/icons-material/FlashlightOn';
 import FlashlightOffIcon from '@mui/icons-material/FlashlightOff';
 import Feedback from './Feedback';
-import ScanningAreaHighlight from './ScanningAreaHighlight';
+import ScanningStatusIndicator from './ScanningStatusIndicator';
 import './App.css';
 
 const QrCodeScanner = ({ onScan, onClose }) => {
@@ -125,52 +125,47 @@ const QrCodeScanner = ({ onScan, onClose }) => {
                         <MenuItem value="UPC_A">Barcode (UPC-A)</MenuItem>
                     </Select>
                 </FormControl>
-                <Box className="box">
-                    {loading ? (
-                        <CircularProgress className="circular-progress" />
-                    ) : (
-                        <>
-                            {!isScanning && (
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={startScanning}
-                                    className="button button-primary"
-                                    startIcon={<CameraAltIcon />}
-                                >
-                                    Start Scanning
-                                </Button>
-                            )}
-                            {isScanning && (
-                                <IconButton
-                                    color="secondary"
-                                    onClick={toggleFlashlight}
-                                    className="flashlight-button"
-                                >
-                                    {flashlightOn ? <FlashlightOffIcon /> : <FlashlightOnIcon />}
-                                </IconButton>
-                            )}
-                            <div className="video-container">
-                                <video ref={videoRef} className={`video ${isScanning ? 'active' : ''}`} />
-                                {isScanning && <ScanningAreaHighlight />}
-                            </div>
-                        </>
+                <Box className="box" display="flex" justifyContent="center" alignItems="center" flexDirection="column" mt={2}>
+                    <ScanningStatusIndicator loading={loading} isScanning={isScanning} />
+                    {!isScanning && !loading && (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={startScanning}
+                            className="button button-primary"
+                            startIcon={<CameraAltIcon />}
+                            style={{ marginTop: '16px' }}
+                        >
+                            Start Scanning
+                        </Button>
                     )}
+                    {isScanning && (
+                        <IconButton
+                            color="secondary"
+                            onClick={toggleFlashlight}
+                            className="flashlight-button"
+                        >
+                            {flashlightOn ? <FlashlightOffIcon /> : <FlashlightOnIcon />}
+                        </IconButton>
+                    )}
+                    <div className="video-container">
+                        <video ref={videoRef} className={`video ${isScanning ? 'active' : ''}`} />
+                    </div>
                 </Box>
                 <Typography variant="h6" gutterBottom>
                     Scan History
                 </Typography>
-                <TableContainer component={Paper}>
+                <TableContainer component={Paper} style={{ marginTop: '16px', borderRadius: '8px', boxShadow: '0 3px 5px rgba(0,0,0,0.1)' }}>
                     <Table>
-                        <TableHead>
+                        <TableHead style={{ backgroundColor: '#f5f5f5' }}>
                             <TableRow>
-                                <TableCell>Format</TableCell>
-                                <TableCell>Text</TableCell>
+                                <TableCell style={{ fontWeight: 'bold' }}>Format</TableCell>
+                                <TableCell style={{ fontWeight: 'bold' }}>Text</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {scanHistory.map((item, index) => (
-                                <TableRow key={index}>
+                                <TableRow key={index} style={{ backgroundColor: index % 2 === 0 ? '#fafafa' : '#fff' }}>
                                     <TableCell>{item.format}</TableCell>
                                     <TableCell>{item.text}</TableCell>
                                 </TableRow>
@@ -185,3 +180,4 @@ const QrCodeScanner = ({ onScan, onClose }) => {
 };
 
 export default QrCodeScanner;
+
