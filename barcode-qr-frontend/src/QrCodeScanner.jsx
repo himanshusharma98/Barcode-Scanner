@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { BrowserMultiFormatReader, BarcodeFormat } from '@zxing/browser';
-import { Box, Card, CardContent, Typography, Button, FormControl, InputLabel, Select, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
+import { Box, Card, CardContent, Typography, Button, FormControl, InputLabel, Select, MenuItem, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Dialog, DialogTitle } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import FlashlightOnIcon from '@mui/icons-material/FlashlightOn';
 import FlashlightOffIcon from '@mui/icons-material/FlashlightOff';
+import CloseIcon from '@mui/icons-material/Close';
 import Feedback from './Feedback';
 import ScanningStatusIndicator from './ScanningStatusIndicator';
+import DeleteConfirmationDialog from './DeleteConfirmationDialog';
 import './App.css';
 
 const QrCodeScanner = ({ onScan, onClose }) => {
@@ -18,6 +20,8 @@ const QrCodeScanner = ({ onScan, onClose }) => {
     const [scanHistory, setScanHistory] = useState([]);
     const [playSound, setPlaySound] = useState(true);
     const [vibrate, setVibrate] = useState(true);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
 
     const supportedFormats = [
         'QR_CODE',
@@ -97,6 +101,17 @@ const QrCodeScanner = ({ onScan, onClose }) => {
         }
     };
 
+    const handleDelete = (item) => {
+        setItemToDelete(item);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = () => {
+        setScanHistory(scanHistory.filter(item => item !== itemToDelete));
+        setDeleteDialogOpen(false);
+        setItemToDelete(null);
+    };
+
     useEffect(() => {
         return () => {
             stopScanning();
@@ -104,11 +119,23 @@ const QrCodeScanner = ({ onScan, onClose }) => {
     }, []);
 
     return (
-        <Card className="card">
+        <Dialog open onClose={onClose} maxWidth="md" fullWidth>
+            <DialogTitle>
+                <Typography variant="h5">Code Scanner</Typography>
+                <IconButton
+                    aria-label="close"
+                    onClick={onClose}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                >
+                    <CloseIcon />
+                </IconButton>
+            </DialogTitle>
             <CardContent className="card-content">
-                <Typography variant="h5" gutterBottom>
-                    Code Scanner
-                </Typography>
                 <FormControl className="form-control">
                     <InputLabel id="scan-type-label">Scan Type</InputLabel>
                     <Select
@@ -161,6 +188,7 @@ const QrCodeScanner = ({ onScan, onClose }) => {
                             <TableRow>
                                 <TableCell style={{ fontWeight: 'bold' }}>Format</TableCell>
                                 <TableCell style={{ fontWeight: 'bold' }}>Text</TableCell>
+                                <TableCell style={{ fontWeight: 'bold' }}>Actions</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -168,6 +196,11 @@ const QrCodeScanner = ({ onScan, onClose }) => {
                                 <TableRow key={index} style={{ backgroundColor: index % 2 === 0 ? '#fafafa' : '#fff' }}>
                                     <TableCell>{item.format}</TableCell>
                                     <TableCell>{item.text}</TableCell>
+                                    <TableCell>
+                                        <IconButton color="secondary" onClick={() => handleDelete(item)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -175,9 +208,13 @@ const QrCodeScanner = ({ onScan, onClose }) => {
                 </TableContainer>
                 <Feedback playSound={playSound} vibrate={vibrate} />
             </CardContent>
-        </Card>
+            <DeleteConfirmationDialog
+                open={deleteDialogOpen}
+                onClose={() => setDeleteDialogOpen(false)}
+                onConfirm={confirmDelete}
+            />
+        </Dialog>
     );
 };
 
 export default QrCodeScanner;
-
